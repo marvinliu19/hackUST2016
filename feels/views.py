@@ -1,5 +1,4 @@
-from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django import *
 from TwitterAPI import *
 
 def index(request):
