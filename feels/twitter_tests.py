@@ -1,5 +1,5 @@
 from TwitterAPI import *
-import json
+from vaderSentiment import vaderSentiment
 
 
 #authentification
@@ -12,3 +12,5 @@ r = api.request('search/tweets', {'q': myQuery, 'lang': 'en', 'count':count})
 
 for item in r: #each tweet will be a Python dictionary
     print(item['text'].encode('ascii', 'ignore'))
+    vs = vaderSentiment.sentiment("hey w4tasrtgawg")
+    print("\n\t" + str(vs))
