@@ -8,15 +8,13 @@ print("authentification success\n")
 
 myQuery = "Donald Trump"
 count = 10
-r = api.request('search/tweets', {'q': myQuery, 'lang': 'en', 'count':count})
+tweets = api.request('search/tweets', {'q': myQuery, 'lang': 'en', 'geocode': '37.781157,-122.398720, 6371km','count':count})
 
-for item in r: #each tweet will be a Python dictionary
-    text = item['text'].encode('ascii', 'ignore')
-    print text
-    
+for tweet in tweets:
+    text = tweet['text'].encode('ascii', 'ignore')
     clean_text = ' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)"," ",text).split())
     print clean_text
+    print tweet['geo']
+    vs = vader(clean_text)
 
-    vs = vader(text)
-    
-    print("\n\t" + str(vs))
+    print str(vs['compound'])
