@@ -1,7 +1,37 @@
-<h1>homepage</h1>
+<!DOCTYPE html>
+<head>
+    <link rel="stylesheet" type="text/css" href="bootstrap.css">
+    <!--<link rel="stylesheet" type="text/css" href="bootstrap.min.css">-->
 
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.js"></script>
+
+    <title>Ja Feel</title>
+</head>
+
+<body style="background-image: url('bg.jpg'); background-size: 100%; background-repeat: no-repeat;">
+
+
+    <div>
+    <form>
+            <div align="center" class="incenter">
+                <h1 style="color: white; font-weight: bold;">Browse the worlds trends.</h1>
+                <!--<h1 style="color: white; font-weight: bold;>Browse the worlds trends.</h1>-->
+                <input type="text" class="form-control" id="usr" style="width: 50%;">
+                <div style="padding-top: 2%">
+                    <button type="button" class="btn btn-default">Search</button>
+                </div>
+
+            </div>
+        </form>
 <form action="display/" method="post">
     {% csrf_token %}
     {{ form }}
     <input type="submit" value="Submit" />
 </form>
+    </div>
+</body>
+
