@@ -5,6 +5,6 @@ def index(request):
   context = {}
   return render(request, 'feels/index.html', context)
 
-def results(request):
-  response = "Your query was"
-  return HttpResponse(response)
+def display(request):
+  context = {}
+  return render(request, 'feels/display.html', context)
