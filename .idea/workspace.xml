@@ -2,6 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="5e1caaae-e4c4-497b-8250-c28282c34685" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/TwitterAPI/BearerAuth.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/TwitterAPI/TwitterAPI.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/TwitterAPI/TwitterError.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/TwitterAPI/TwitterOAuth.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/TwitterAPI/TwitterRestPager.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/TwitterAPI/__init__.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/TwitterAPI/constants.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/TwitterAPI/credentials.txt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="hackUST2016.iws" />
@@ -69,8 +77,8 @@
       <file leaf-file-name="views.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/feels/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="119">
-              <caret line="7" column="32" selection-start-line="7" selection-start-column="32" selection-end-line="7" selection-end-column="32" />
+            <state relative-caret-position="153">
+              <caret line="9" column="25" selection-start-line="9" selection-start-column="25" selection-end-line="9" selection-end-column="25" />
               <folding>
                 <element signature="e#0#44#0" expanded="true" />
               </folding>
@@ -279,6 +287,11 @@
     <property name="js-jscs-nodeInterpreter" value="C:\Program Files\nodejs\node.exe" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
     <property name="settings.editor.splitter.proportion" value="0.2" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\James\PycharmProjects\hackUST2016" />
+    </key>
   </component>
   <component name="RunManager">
     <configuration default="true" type="DjangoTestsConfigurationType" factoryName="Django tests">
@@ -532,7 +545,14 @@
       <option name="project" value="LOCAL" />
       <updated>1460792102008</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="put TwitterAPI files in project">
+      <created>1460793561769</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1460793561769</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -577,7 +597,8 @@
     <MESSAGE value="form takes in query string and passes it to other view" />
     <MESSAGE value="cleaned up query parsing and passing" />
     <MESSAGE value="include TwitterAPI in views" />
-    <option name="LAST_COMMIT_MESSAGE" value="include TwitterAPI in views" />
+    <MESSAGE value="put TwitterAPI files in project" />
+    <option name="LAST_COMMIT_MESSAGE" value="put TwitterAPI files in project" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -854,8 +875,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/feels/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="7" column="32" selection-start-line="7" selection-start-column="32" selection-end-line="7" selection-end-column="32" />
+        <state relative-caret-position="153">
+          <caret line="9" column="25" selection-start-line="9" selection-start-column="25" selection-end-line="9" selection-end-column="25" />
           <folding>
             <element signature="e#0#44#0" expanded="true" />
           </folding>
