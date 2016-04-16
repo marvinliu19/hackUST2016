@@ -13,19 +13,42 @@
   <body>
     <h1> QUERY: {{ query }} </h1>
     <script type="text/javascript">
-      var feeling_data_raw = jQuery.parseJSON('{{ feeling_data }}'.replace(/&quot;/g,'"'));
-      var feeling_labels = [];
+      var bio_data_raw = '{{ bio_data }}'.replace(/&quot;/g,'"');
+      var tweet_data_raw = '{{ tweet_data }}'.replace(/&quot;/g,'"');
+      var bio_data = jQuery.parseJSON(bio_data_raw)
+      var tweet_data = jQuery.parseJSON(tweet_data_raw)
+      var tweets = tweet_data['tweets'];
+      
+      var dates = [];
       var feeling_data = [];
-
-      for (var key in feeling_data_raw) {
-        if (feeling_data_raw.hasOwnProperty(key)) {
-          feeling_labels.push(key);
-          feeling_data.push(feeling_data_raw[key]);
+      var retweet_data = [];
+      for (var i in tweets) {
+        date_obj = new Date(tweets[i]['date']);
+        
+        var month = date_obj.getMonth() + 1;
+        var hour = 0;
+        var minute = 0;
+        hr = date_obj.getHours();
+        if (hr < 10) {
+          hour = "0" + hr;
+        } else {
+          hour = hr;
         }
-      }
-
+        min = date_obj.getMinutes();
+        if (min < 10) {
+          minute = "0" + min;
+        } else {
+          minute = min;
+        }
+        var year = date_obj.getFullYear() + "";
+        year = year.substring(2);
+        date = month + "/" + date_obj.getDate() + "/" + year + " at " + hour + ":" + minute;
+        dates.push(date);
+        feeling_data.push(tweets[i]['sentiment']['compound']);
+        retweet_data.push(tweets[i]['retweet_count']);
+      };
       var feeling_data = {
-          labels: feeling_labels,
+          labels: dates,
           datasets: [
             {
               fillColor: "rgba(0,0,0,0)",
@@ -36,20 +59,8 @@
             },
           ]
         };
-
-      var retweet_data_raw = jQuery.parseJSON('{{ retweet_data }}'.replace(/&quot;/g,'"'));
-      var retweet_labels = [];
-      var retweet_data = [];
-
-      for (var key in retweet_data_raw) {
-        if (retweet_data_raw.hasOwnProperty(key)) {
-          retweet_labels.push(key);
-          retweet_data.push(retweet_data_raw[key]);
-        }
-      }
-
       var retweet_data = {
-          labels: retweet_labels,
+          labels: dates,
           datasets: [
             {
               fillColor: "rgba(0,0,0,0)",
@@ -60,20 +71,16 @@
             }
           ]
         };
-
       window.onload = function() {
         var feeling_ctx = $("#feeling").get(0).getContext("2d");
         var retweet_ctx = $("#retweet").get(0).getContext("2d");
-
         var feeling_chart = new Chart(feeling_ctx).Line(feeling_data, {
           scaleShowVerticalLines: false
         });
-
         var retweet_chart = new Chart(retweet_ctx).Line(retweet_data, {
           scaleShowVerticalLines: false
         });
       };
-
     </script>
 
     <div style="width: 50%">
