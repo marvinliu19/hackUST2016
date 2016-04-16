@@ -18,39 +18,46 @@ def display(request):
   bio_output = ""
   tweets_output = ""
 
+  name_query = 'kanyewest'
+
   if request.method == "POST":
-    api = TwitterAPI('BQBZTbY3ugTypaRBq7Is0m6Dh', 'JGeRqs3r42Id4W2Q47NlGwAlNYv0myrBhlUPJeeizQXi56RWBm', auth_type='oAuth2')
     name_query = request.POST['query_text']
-    count = 10
-    tweets = api.request('statuses/user_timeline', {'screen_name': name_query, 'count':count, 'exclude_replies':'true', 'include_rts':'false'})
 
-    personalInfoResponse = api.request('users/show', {'screen_name' : name_query, 'include_entities' : 'false'}).json()
+  api = TwitterAPI('BQBZTbY3ugTypaRBq7Is0m6Dh', 'JGeRqs3r42Id4W2Q47NlGwAlNYv0myrBhlUPJeeizQXi56RWBm', auth_type='oAuth2')
+  count = 100
+  tweets = api.request('statuses/user_timeline', {'screen_name': name_query, 'count':count, 'exclude_replies':'true', 'include_rts':'false'})
 
-    realName = personalInfoResponse['name']
-    handle = personalInfoResponse['screen_name']
-    bio = personalInfoResponse['description']
-    profilePicture = personalInfoResponse['profile_image_url']
-    coverPhoto = personalInfoResponse['profile_banner_url']
+  personalInfoResponse = api.request('users/show', {'screen_name' : name_query, 'include_entities' : 'false'}).json()
 
-    bio_dict = {'name' : realName, 'handle' : handle, 'bio' : bio, 'profilePicture' : profilePicture, 'coverPhoto' : coverPhoto}
-    tweets_dict = {'tweets': []}
-    for tweet in tweets: #each tweet will be a Python dictionary
-      text = tweet['text'].encode('ascii', 'ignore')
-      text = ' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)"," ",text).split())
-      
-      date = tweet['created_at'].encode('ascii', 'ignore')
-      retweet_count = tweet['retweet_count']
-      sentiment = vader(text)
+  realName = personalInfoResponse['name']
+  handle = personalInfoResponse['screen_name']
+  bio = personalInfoResponse['description']
+  profilePicture = personalInfoResponse['profile_image_url']
+  coverPhoto = personalInfoResponse['profile_banner_url']
 
-      tweet_data = {"text" : text, "date" : date, "retweet_count" : retweet_count, "sentiment" : sentiment}
-      tweets_dict["tweets"].insert(0, tweet_data)
-    
-    bio_output = json.dumps(bio_dict)
-    tweets_output = json.dumps(tweets_dict)
+  bio_dict = {'name' : realName, 'handle' : handle, 'bio' : bio, 'profilePicture' : profilePicture, 'coverPhoto' : coverPhoto}
+  tweets_dict = {'tweets': []}
+  for tweet in tweets: #each tweet will be a Python dictionary
+    text = tweet['text'].encode('ascii', 'ignore')
+    text = ' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)"," ",text).split())
+    text.strip()
 
-    context = {
-      'query': name_query
-    }
+    if text == "":
+      continue
+
+    date = tweet['created_at'].encode('ascii', 'ignore')
+    retweet_count = tweet['retweet_count']
+    sentiment = vader(text)
+
+    tweet_data = {"text" : text, "date" : date, "retweet_count" : retweet_count, "sentiment" : sentiment}
+    tweets_dict["tweets"].insert(0, tweet_data)
+  
+  bio_output = json.dumps(bio_dict)
+  tweets_output = json.dumps(tweets_dict)
+
+  context = {
+    'query': name_query
+  }
 
   context = RequestContext(request, context)
   context['bio_data'] = bio_output
