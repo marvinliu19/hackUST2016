@@ -1,87 +1,366 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+{% load static %}
+<head>
+
     <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
 
     <title>Ja Feel</title>
-  
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.1.1/Chart.min.js"></script>
+
+    <!-- Bootstrap Core CSS -->
+    <!--<link href="css/bootstrap.min.css" rel="stylesheet">-->
+    <link rel="stylesheet" type="text/css" href="{% static 'bootstrap.css' %}" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" type="text/css" href="{% static 'stylish-portfolio.css' %}" />
+
+    <!-- Custom Fonts -->
+    <link href="{% static 'font-awesome/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css">
+     <link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 
-  </head>
-  <body>
-    <h1> QUERY: {{ query }} </h1>
-    <script type="text/javascript">
-      var feeling_data_raw = jQuery.parseJSON('{{ feeling_data }}'.replace(/&quot;/g,'"'));
-      var feeling_labels = [];
-      var feeling_data = [];
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
 
-      for (var key in feeling_data_raw) {
-        if (feeling_data_raw.hasOwnProperty(key)) {
-          feeling_labels.push(key);
-          feeling_data.push(feeling_data_raw[key]);
-        }
-      }
+</head>
 
-      var feeling_data = {
-          labels: feeling_labels,
-          datasets: [
-            {
-              fillColor: "rgba(0,0,0,0)",
-              strokeColor: "rgba(151,187,205,1)",
-              pointColor: "rgba(151,187,205,1)",
-              pointStrokeColor: "#fff",
-              data: feeling_data
-            },
-          ]
+<body>
+  <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var feeling_arr = [['Date', 'Sentiment']];
+        var retweet_arr = [['Date', 'Retweets']];
+
+        var bio_data_raw = '{{ bio_data }}'.replace(/&quot;/g,'"');
+        var tweet_data_raw = '{{ tweet_data }}'.replace(/&quot;/g,'"');
+        var bio_data = jQuery.parseJSON(bio_data_raw)
+        var tweet_data = jQuery.parseJSON(tweet_data_raw)
+        var tweets = tweet_data['tweets'];
+        
+        for (var i in tweets) {
+          date_obj = new Date(tweets[i]['date']);
+          date = new Date(date_obj.getFullYear(), date_obj.getMonth(), date_obj.getDate(), date_obj.getHours(), date_obj.getMinutes());
+
+          var feeling_entry = [date, tweets[i]['sentiment']['compound']];
+          var retweet_entry = [date, tweets[i]['retweet_count']];
+          
+          feeling_arr.push(feeling_entry);
+          retweet_arr.push(retweet_entry);
         };
 
-      var retweet_data_raw = jQuery.parseJSON('{{ retweet_data }}'.replace(/&quot;/g,'"'));
-      var retweet_labels = [];
-      var retweet_data = [];
-
-      for (var key in retweet_data_raw) {
-        if (retweet_data_raw.hasOwnProperty(key)) {
-          retweet_labels.push(key);
-          retweet_data.push(retweet_data_raw[key]);
-        }
-      }
-
-      var retweet_data = {
-          labels: retweet_labels,
-          datasets: [
-            {
-              fillColor: "rgba(0,0,0,0)",
-              strokeColor: "rgba(151,187,205,1)",
-              pointColor: "rgba(151,187,205,1)",
-              pointStrokeColor: "#fff",
-              data: retweet_data
+        var feeling_data = google.visualization.arrayToDataTable(feeling_arr);
+        var feeling_options = {
+          animation: {startup: true, duration: 1, easing: 'in'},
+          legend: {position: 'none'},
+          hAxis: {
+            format: 'M/d/yy',
+            gridlines: {
+              color: 'none',
+              count: 4
             }
-          ]
+          },
+          vAxis: { 
+            title: "Sentiment", 
+            viewWindowMode:'explicit',
+            viewWindow:{
+              max:1,
+              min:-1
+            }
+          }
         };
 
-      window.onload = function() { 
-        var feeling_ctx = $("#feeling").get(0).getContext("2d");
-        var retweet_ctx = $("#retweet").get(0).getContext("2d");
+        var retweet_data = google.visualization.arrayToDataTable(retweet_arr);
+        var retweet_options = {
+          title: 'Retweets over time',
+          animation: {startup: true, duration: 1, easing: 'in'}
+        };
 
-        var feeling_chart = new Chart(feeling_ctx).Line(feeling_data, {
-          scaleShowVerticalLines: false
-        });
+        var feeling_chart = new google.visualization.ScatterChart(document.getElementById('feeling'));
+        var retweet_chart = new google.visualization.ScatterChart(document.getElementById('retweet'));
 
-        var retweet_chart = new Chart(retweet_ctx).Line(retweet_data, {
-          scaleShowVerticalLines: false
-        });
-      };
+        feeling_chart.draw(feeling_data, feeling_options);
+        retweet_chart.draw(retweet_data, retweet_options);
+
+      }
 
     </script>
-    
-    <div style="width: 50%">
-        <canvas id="feeling" height="450" width="800"></canvas>
-    </div>
 
-    <div style="width: 50%">
-        <canvas id="retweet" height="450" width="800"></canvas>
+<style>
+body {
+    font-family: "Lato", sans-serif;
+}
+
+.sidenav {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #111;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+}
+
+.sidenav a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+    transition: 0.3s
+}
+
+.sidenav a:hover, .offcanvas a:focus{
+    color: #f1f1f1;
+}
+
+.closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px !important;
+    margin-left: 50px;
+}
+
+@media screen and (max-height: 450px) {
+  .sidenav {padding-top: 15px;}
+  .sidenav a {font-size: 18px;}
+}
+</style>
+
+    <!-- Navigation -->
+    <!--<a id="menu-toggle" href="#" class="btn btn-dark btn-lg toggle"><i class="fa fa-bars"></i></a>-->
+    <!--<nav id="sidebar-wrapper">-->
+        <!--<ul class="sidebar-nav">-->
+            <!--<a id="menu-close" href="#" class="btn btn-light btn-lg pull-left toggle"><i class="fa fa-times"></i></a>-->
+            <!--<li class="sidebar-brand">-->
+                <!--<a href="#top"  onclick = $("#menu-close").click(); >Statistics</a>-->
+            <!--</li>-->
+            <!--<li>-->
+                <!--<a href="#top" onclick = $("#menu-close").click(); >Overview</a>-->
+            <!--</li>-->
+            <!--<li>-->
+                <!--<a href="#feelings" onclick = $("#menu-close").click(); >Feelings</a>-->
+            <!--</li>-->
+            <!--<li>-->
+                <!--<a href="#popular" onclick = $("#menu-close").click(); >Popularity</a>-->
+            <!--</li>-->
+            <!--<li>-->
+                <!--<a href="#whatup" onclick = $("#menu-close").click(); >What's up?</a>-->
+            <!--</li>-->
+            <!--<li>-->
+                <!--<a href="#moodswing" onclick = $("#menu-close").click(); >What are the talking about?</a>-->
+            <!--</li>-->
+        <!--</ul>-->
+    <!--</nav>-->
+
+
+<span style=";font-size:30px; padding-left: 5px; cursor: auto" onclick="openNav()">☰</span>
+
+    <div id="mySidenav" class="sidenav">
+  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+        <a href="#top">Overview</a>
+        <a href="#feelings">Feelings</a>
+        <a href="#popular">Popularity</a>
+        <a href="#whatup">Whats up?</a>
+        <a href="#moodswing">Mood Swings</a>
     </div>
-  
-  </body>
+        
+    <!-- Header -->
+    <header id="top" class="header">
+        <div class="text-vertical-center">
+            <h1>Start Bootstrap</h1>
+            <h3>Free Bootstrap Themes &amp; Templates</h3>
+            <br>
+        </div>
+    </header>
+
+    <!-- Feelings -->
+    <section id="feelings" class="about">
+        <div class="container">
+            <div>
+                <div class="text-center">
+                    <h2>Feelings</h2>
+                    <div id="feeling" style="width: 900px; height: 500px"></div>
+                </div>
+            </div>
+            <!-- /.row -->
+        </div>
+        <!-- /.container -->
+    </section>
+
+    <!-- Services -->
+    <!-- The circle icons use Font Awesome's stacked icon classes. For more information, visit http://fontawesome.io/examples/ -->
+    <section id="popular" class="services bg-primary">
+        <div class="container">
+            <div class="text-center">
+                <div class="text-center">
+                    <h2>Popularity</h2>
+                    <div id="retweet" style="width: 900px; height: 500px"></div>
+                    </div>
+                    <!-- /.row (nested) -->
+                </div>
+                <!-- /.col-lg-10 -->
+            </div>
+            <!-- /.row -->
+        </div>
+        <!-- /.container -->
+    </section>
+
+    <section id="whatup" class="about">
+        <div class="container">
+            <div class="text-center">
+                <div class="text-center">
+                    <h2>Whats up?</h2>
+                </div>
+                    <!-- /.row (nested) -->
+            </div>
+                <!-- /.col-lg-10 -->
+        </div>
+            <!-- /.row -->
+
+        <!-- /.container -->
+    </section>
+
+
+
+    <section id="moodswing" class="services bg-primary">
+        <div class="container">
+            <div class="text-center">
+                <div class="text-center">
+                    <h2>Moodswings</h2>
+                    </div>
+                    <!-- /.row (nested) -->
+                </div>
+                <!-- /.col-lg-10 -->
+            </div>
+            <!-- /.row -->
+        </div>
+        <!-- /.container -->
+    </section>
+
+    <!-- jQuery -->
+    <script href="{% static 'jquery.js' %}"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script href="{% static 'bootstrap.min.js' %}"></script>
+
+
+    <script>
+        function openNav() {
+            document.getElementById("mySidenav").style.width = "250px";
+        }
+
+        function closeNav() {
+            document.getElementById("mySidenav").style.width = "0";
+        }
+    </script>
+
+</body>
+
 </html>
+
+<!--<!DOCTYPE html>-->
+<!--{% load static %}-->
+<!--<html lang="en">-->
+  <!--<head>-->
+      <!--<link rel="stylesheet" type="text/css" href="{% static 'bootstrap.css' %}">-->
+      <!--&lt;!&ndash;<link rel="stylesheet" type="text/css" href="bootstrap.min.css">&ndash;&gt;-->
+
+    <!--<title>Ja Feel</title>-->
+
+    <!--<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.1.1/Chart.min.js"></script>-->
+    <!--<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>-->
+
+  <!--</head>-->
+  <!--<body>-->
+    <!--<h1> QUERY: {{ query }} </h1>-->
+    <!--<script type="text/javascript">-->
+      <!--var feeling_data_raw = jQuery.parseJSON('{{ feeling_data }}'.replace(/&quot;/g,'"'));-->
+      <!--var feeling_labels = [];-->
+      <!--var feeling_data = [];-->
+
+      <!--for (var key in feeling_data_raw) {-->
+        <!--if (feeling_data_raw.hasOwnProperty(key)) {-->
+          <!--feeling_labels.push(key);-->
+          <!--feeling_data.push(feeling_data_raw[key]);-->
+        <!--}-->
+      <!--}-->
+
+      <!--var feeling_data = {-->
+          <!--labels: feeling_labels,-->
+          <!--datasets: [-->
+            <!--{-->
+              <!--fillColor: "rgba(0,0,0,0)",-->
+              <!--strokeColor: "rgba(151,187,205,1)",-->
+              <!--pointColor: "rgba(151,187,205,1)",-->
+              <!--pointStrokeColor: "#fff",-->
+              <!--data: feeling_data-->
+            <!--},-->
+          <!--]-->
+        <!--};-->
+
+      <!--var retweet_data_raw = jQuery.parseJSON('{{ retweet_data }}'.replace(/&quot;/g,'"'));-->
+      <!--var retweet_labels = [];-->
+      <!--var retweet_data = [];-->
+
+      <!--for (var key in retweet_data_raw) {-->
+        <!--if (retweet_data_raw.hasOwnProperty(key)) {-->
+          <!--retweet_labels.push(key);-->
+          <!--retweet_data.push(retweet_data_raw[key]);-->
+        <!--}-->
+      <!--}-->
+
+      <!--var retweet_data = {-->
+          <!--labels: retweet_labels,-->
+          <!--datasets: [-->
+            <!--{-->
+              <!--fillColor: "rgba(0,0,0,0)",-->
+              <!--strokeColor: "rgba(151,187,205,1)",-->
+              <!--pointColor: "rgba(151,187,205,1)",-->
+              <!--pointStrokeColor: "#fff",-->
+              <!--data: retweet_data-->
+            <!--}-->
+          <!--]-->
+        <!--};-->
+
+      <!--window.onload = function() {-->
+        <!--var feeling_ctx = $("#feeling").get(0).getContext("2d");-->
+        <!--var retweet_ctx = $("#retweet").get(0).getContext("2d");-->
+
+        <!--var feeling_chart = new Chart(feeling_ctx).Line(feeling_data, {-->
+          <!--scaleShowVerticalLines: false-->
+        <!--});-->
+
+        <!--var retweet_chart = new Chart(retweet_ctx).Line(retweet_data, {-->
+          <!--scaleShowVerticalLines: false-->
+        <!--});-->
+      <!--};-->
+
+    <!--</script>-->
+
+    <!--<div style="width: 50%">-->
+        <!--<canvas id="feeling" height="450" width="800"></canvas>-->
+    <!--</div>-->
+
+    <!--<div style="width: 50%">-->
+        <!--<canvas id="retweet" height="450" width="800"></canvas>-->
+    <!--</div>-->
+
+  <!--</body>-->
+<!--</html>-->
