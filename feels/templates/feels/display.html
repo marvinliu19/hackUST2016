@@ -32,7 +32,7 @@
               pointColor: "rgba(151,187,205,1)",
               pointStrokeColor: "#fff",
               data: feeling_data
-            }
+            },
           ]
         };
 
@@ -64,10 +64,15 @@
         var feeling_ctx = $("#feeling").get(0).getContext("2d");
         var retweet_ctx = $("#retweet").get(0).getContext("2d");
 
-        var feeling_chart = new Chart(feeling_ctx).Line(feeling_data);
-        var retweet_chart = new Chart(retweet_ctx).Line(retweet_data);
+        var feeling_chart = new Chart(feeling_ctx).Line(feeling_data, {
+          scaleShowVerticalLines: false
+        });
+
+        var retweet_chart = new Chart(retweet_ctx).Line(retweet_data, {
+          scaleShowVerticalLines: false
+        });
       };
-      
+
     </script>
     
     <div style="width: 50%">

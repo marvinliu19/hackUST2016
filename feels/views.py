@@ -18,7 +18,6 @@ def display(request):
         api = TwitterAPI('BQBZTbY3ugTypaRBq7Is0m6Dh', 'JGeRqs3r42Id4W2Q47NlGwAlNYv0myrBhlUPJeeizQXi56RWBm', auth_type='oAuth2')
         myQuery = request.POST['query_text']  # takes in query from front-end
         r = api.request('search/tweets', {'q': myQuery})
-
         
         context = {
             'query': myQuery,
