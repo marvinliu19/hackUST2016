@@ -34,8 +34,9 @@ def display(request):
   bio = personalInfoResponse['description']
   profilePicture = personalInfoResponse['profile_image_url']
   coverPhoto = personalInfoResponse['profile_banner_url']
+  followers = personalInfoResponse['followers_count']
 
-  bio_dict = {'name' : realName, 'handle' : handle, 'bio' : bio, 'profilePicture' : profilePicture, 'coverPhoto' : coverPhoto}
+  bio_dict = {'name' : realName, 'handle' : handle, 'bio' : bio, 'profilePicture' : profilePicture, 'coverPhoto' : coverPhoto, 'followers' : followers}
   tweets_dict = {'tweets': []}
   for tweet in tweets: #each tweet will be a Python dictionary
     text = tweet['text'].encode('ascii', 'ignore')
