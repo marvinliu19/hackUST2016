@@ -1,5 +1,6 @@
-from django.http import HttpResponse
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from .forms import NameForm
 
 def index(request):
   context = {}
@@ -9,12 +10,11 @@ def index(request):
       form = NameForm(request.POST)
       # check whether it's valid:
       if form.is_valid():
-          # process the data in form.cleaned_data as required
-          # ...
-          # redirect to a new URL:
-          cd = form.cleaned_data
-          cd
-          return HttpResponseRedirect('feels/display.html')
+          myQuery = request.POST['query']
+          context = {
+              'query': myQuery
+          }
+          return render(request, 'feels/index.html', context)
 
   # if a GET (or any other method) we'll create a blank form
   else:
