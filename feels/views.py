@@ -5,6 +5,7 @@ from django.template import RequestContext
 from TwitterAPI import *
 from vaderSentiment.vaderSentiment import sentiment as vader
 import re
+from collections import Counter as count
 
 from .forms import QueryForm
 
@@ -33,48 +34,67 @@ def search_users(query):
     return user_list
 
 def build_bio_dict(personalInfo):
-  "builds bio dictionary with raw tweeter user's info"
-  realName = personalInfo['name']
-  handle = personalInfo['screen_name']
-  followers = personalInfo['followers_count']
-  # We need to check the existence of the following fields
-  # if they don't exist we create empty one
-  if 'description' in personalInfo:
-    bio = personalInfo['description']
-  else:
-    bio = ""
-  if 'profile_image_url' in personalInfo:
-    profilePicture = personalInfo['profile_image_url']
-  else:
-    profilePicture = ""
-  if 'profile_banner_url' in personalInfo:
-    coverPhoto = personalInfo['profile_banner_url']
-  else:
-    coverPhoto = ""
+    "builds bio dictionary with raw tweeter user's info"
+    realName = personalInfo['name']
+    handle = personalInfo['screen_name']
+    followers = personalInfo['followers_count']
+    # We need to check the existence of the following fields
+    # if they don't exist we create empty one
+    if 'description' in personalInfo:
+        bio = personalInfo['description']
+    else:
+        bio = ""
+    if 'profile_image_url' in personalInfo:
+        profilePicture = personalInfo['profile_image_url']
+    else:
+        profilePicture = ""
+    if 'profile_banner_url' in personalInfo:
+        coverPhoto = personalInfo['profile_banner_url']
+    else:
+        coverPhoto = ""
 
-  bio_dict = {'name' : realName, 'handle' : handle, 'bio' : bio, 'profilePicture' : profilePicture, 'coverPhoto' : coverPhoto, 'followers' : followers}
-  return bio_dict
+    bio_dict = {'name' : realName, 'handle' : handle, 'bio' : bio, 'profilePicture' : profilePicture, 'coverPhoto' : coverPhoto, 'followers' : followers}
+    return bio_dict
 
 def build_tweets_dict(tweets):
-  "builds tweets dictionary with raw tweeter tweets"
-  tweets_dict = {'tweets': []}
-  for tweet in tweets: #each tweet will be a Python dictionary
-    text = tweet['text'].encode('ascii', 'ignore')
-    text = ' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)"," ",text).split())
-    text.strip()
+    "builds tweets dictionary with raw tweeter tweets"
+    tweets_dict = {'tweets': []}
+    for tweet in tweets: #each tweet will be a Python dictionary
+        text = tweet['text'].encode('ascii', 'ignore')
+        text = ' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)"," ",text).split())
+        text.strip()
 
-    if text == "":
-      continue
+        if text == "":
+            continue
 
-    date = tweet['created_at'].encode('ascii', 'ignore')
-    retweet_count = tweet['retweet_count']
-    sentiment = vader(text)
+        date = tweet['created_at'].encode('ascii', 'ignore')
+        retweet_count = tweet['retweet_count']
+        sentiment = vader(text)
 
-    tweet_data = {"text" : text, "date" : date, "retweet_count" : retweet_count, "sentiment" : sentiment}
-    tweets_dict["tweets"].insert(0, tweet_data)
-  
-  return tweets_dict
-  
+        tweet_data = {"text" : text, "date" : date, "retweet_count" : retweet_count, "sentiment" : sentiment}
+        tweets_dict["tweets"].insert(0, tweet_data)
+
+    return tweets_dict
+
+def extract_hashtags(s):
+    return [i for i in s.split() if i.startswith("#") ]
+
+def build_hashtag_freq(tweets):
+    hashtag_counts = {}
+    for tweet in tweets: #each tweet will be a Python dictionary
+        hashtags = extract_hashtags(tweet['text'].encode('ascii', 'ignore'))
+        for hashtag in hashtags:
+            if hashtag in hashtag_counts:
+                hashtag_counts[hashtag] += 1
+            else:
+                hashtag_counts[hashtag] = 1
+
+    top_hashtags = {'hashtags': []}
+
+    hashtag_counts = count(hashtag_counts)
+    for k, v in hashtag_counts.most_common(7):
+        top_hashtags['hashtags'].append([k, v])
+    return top_hashtags
 
 def index(request):
     form = QueryForm()
@@ -99,7 +119,7 @@ def display(request):
     api = TwitterAPI('BQBZTbY3ugTypaRBq7Is0m6Dh', 'JGeRqs3r42Id4W2Q47NlGwAlNYv0myrBhlUPJeeizQXi56RWBm', auth_type='oAuth2')
 
     # requests to twitter, one for one's tweet the other for one's personal info
-    count = 100
+    count = 200
     tweets = api.request('statuses/user_timeline', {'screen_name': name_query, 'count':count, 'exclude_replies':'true', 'include_rts':'false'})
     personalInfoResponse = api.request('users/show', {'screen_name' : name_query, 'include_entities' : 'false'}).json()
 
@@ -116,7 +136,7 @@ def display(request):
     else:
         bio_output = json.dumps(build_bio_dict(personalInfoResponse))
         tweets_output = json.dumps(build_tweets_dict(tweets))
-
+        top_hashtags = json.dumps(build_hashtag_freq(tweets))
         context = {
           'query': name_query
         }
@@ -124,8 +144,6 @@ def display(request):
         context = RequestContext(request, context)
         context['bio_data'] = bio_output
         context['tweet_data'] = tweets_output
-
-        context['feeling_data'] = json.dumps({'January': -0.2, 'February': -0.5, 'March': 0.1, 'April':0.3, 'May': 0.2, 'June': 0.6, 'July': 0.3})
-        context['retweet_data'] = json.dumps({'January': 2341, 'February': 1232, 'March': 9083, 'April':2032, 'May': 1032, 'June': 821, 'July': 1454})
+        context['top_hashtags'] = top_hashtags
 
         return render_to_response('feels/display.html', context)
