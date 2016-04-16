@@ -40,13 +40,23 @@
       google.charts.load('current', {'packages':['corechart']});
       google.charts.setOnLoadCallback(drawChart);
 
+      var bio_data_raw = '{{ bio_data }}'.replace(/&quot;/g,'"');
+      var bio_data = jQuery.parseJSON(bio_data_raw);
+
+      window.onload = function() {
+          document.getElementById("picture").setAttribute('src', bio_data['profilePicture']);
+          document.getElementById("name").innerHTML=bio_data['name'];
+          document.getElementById("handle").innerHTML += bio_data['handle'];
+          document.getElementById("bio").innerHTML=bio_data['bio'];
+          document.getElementById("followers").innerHTML += bio_data['followers'];
+      }
+
       function drawChart() {
         var feeling_arr = [['Date', 'Sentiment']];
         var retweet_arr = [['Date', 'Retweets']];
+          var colors = [ '#A5D6A7', '#FFCC80', '#EF9A9A', '#ffebee' ];
 
-        var bio_data_raw = '{{ bio_data }}'.replace(/&quot;/g,'"');
         var tweet_data_raw = '{{ tweet_data }}'.replace(/&quot;/g,'"');
-        var bio_data = jQuery.parseJSON(bio_data_raw)
         var tweet_data = jQuery.parseJSON(tweet_data_raw)
         var tweets = tweet_data['tweets'];
         
@@ -65,6 +75,7 @@
         var feeling_options = {
           animation: {startup: true, duration: 1, easing: 'in'},
           legend: {position: 'none'},
+            colors: ['#A5D6A7'],
           hAxis: {
             format: 'M/d/yy',
             gridlines: {
@@ -85,7 +96,8 @@
         var retweet_data = google.visualization.arrayToDataTable(retweet_arr);
         var retweet_options = {
           title: 'Retweets over time',
-          animation: {startup: true, duration: 1, easing: 'in'}
+          animation: {startup: true, duration: 1, easing: 'in'},
+             colors: ['#FFCC80']
         };
 
         var feeling_chart = new google.visualization.ScatterChart(document.getElementById('feeling'));
@@ -137,40 +149,25 @@ body {
     margin-left: 50px;
 }
 
+.circular {
+	width: 300px;
+	height: 300px;
+	border-radius: 150px;
+	-webkit-border-radius: 150px;
+	-moz-border-radius: 150px;
+	background: no-repeat;
+	box-shadow: 0 0 8px rgba(0, 0, 0, .8);
+	-webkit-box-shadow: 0 0 8px rgba(0, 0, 0, .8);
+	-moz-box-shadow: 0 0 8px rgba(0, 0, 0, .8);
+	}
+
 @media screen and (max-height: 450px) {
   .sidenav {padding-top: 15px;}
   .sidenav a {font-size: 18px;}
 }
 </style>
 
-    <!-- Navigation -->
-    <!--<a id="menu-toggle" href="#" class="btn btn-dark btn-lg toggle"><i class="fa fa-bars"></i></a>-->
-    <!--<nav id="sidebar-wrapper">-->
-        <!--<ul class="sidebar-nav">-->
-            <!--<a id="menu-close" href="#" class="btn btn-light btn-lg pull-left toggle"><i class="fa fa-times"></i></a>-->
-            <!--<li class="sidebar-brand">-->
-                <!--<a href="#top"  onclick = $("#menu-close").click(); >Statistics</a>-->
-            <!--</li>-->
-            <!--<li>-->
-                <!--<a href="#top" onclick = $("#menu-close").click(); >Overview</a>-->
-            <!--</li>-->
-            <!--<li>-->
-                <!--<a href="#feelings" onclick = $("#menu-close").click(); >Feelings</a>-->
-            <!--</li>-->
-            <!--<li>-->
-                <!--<a href="#popular" onclick = $("#menu-close").click(); >Popularity</a>-->
-            <!--</li>-->
-            <!--<li>-->
-                <!--<a href="#whatup" onclick = $("#menu-close").click(); >What's up?</a>-->
-            <!--</li>-->
-            <!--<li>-->
-                <!--<a href="#moodswing" onclick = $("#menu-close").click(); >What are the talking about?</a>-->
-            <!--</li>-->
-        <!--</ul>-->
-    <!--</nav>-->
-
-
-<span style=";font-size:30px; padding-left: 5px; cursor: auto" onclick="openNav()">☰</span>
+<div style=";font-size:60px; padding-left: 5px; cursor: auto; background-color: #81D4FA" onclick="openNav()">☰</div>
 
     <div id="mySidenav" class="sidenav">
   <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
@@ -183,20 +180,29 @@ body {
         
     <!-- Header -->
     <header id="top" class="header">
-        <div class="text-vertical-center">
-            <h1>Start Bootstrap</h1>
-            <h3>Free Bootstrap Themes &amp; Templates</h3>
+        <!--<img class="bg-primary" src="{% static 'bg1.jpg' %}" style="width: inherit">-->
+        <div class="text-vertical-center" style="background-color: #81D4FA;">
+            <div style="padding-bottom: 50px;">
+                <img class="circular" src="" id="picture"/>
+            </div>
+            <h1 id="name">NAME</h1>
+            <h2 id="handle">@</h2>
+            <h3 id="bio">BIO</h3>
+            <h4 id="followers">Followers: </h4>
+            <table>
+
+            </table>
             <br>
         </div>
     </header>
 
     <!-- Feelings -->
-    <section id="feelings" class="about">
+    <section id="feelings" style="background-color: #A5D6A7"class="about"><h1 class="text-center" style="font-weight: bold">Feelings</h1></section>
+    <section class="about">
         <div class="container">
             <div>
-                <div class="text-center">
-                    <h2>Feelings</h2>
-                    <div id="feeling" style="width: 900px; height: 500px"></div>
+                <div>
+                    <div  id="feeling" style="width: 100%; height: 500px;"></div>
                 </div>
             </div>
             <!-- /.row -->
@@ -206,12 +212,12 @@ body {
 
     <!-- Services -->
     <!-- The circle icons use Font Awesome's stacked icon classes. For more information, visit http://fontawesome.io/examples/ -->
-    <section id="popular" class="services bg-primary">
+    <section id="popular" style="background-color: #FFCC80"class="about"><h1 class="text-center" style="font-weight: bold">Popularity</h1></section>
+    <section class="about" >
         <div class="container">
             <div class="text-center">
                 <div class="text-center">
-                    <h2>Popularity</h2>
-                    <div id="retweet" style="width: 900px; height: 500px"></div>
+                    <div id="retweet" style="width: 100%; height: 500px;"></div>
                     </div>
                     <!-- /.row (nested) -->
                 </div>
@@ -222,11 +228,12 @@ body {
         <!-- /.container -->
     </section>
 
-    <section id="whatup" class="about">
+    <section id="whatup" style="background-color: #EF9A9A"class="about"><h1 class="text-center" style="font-weight: bold">Whats up?</h1></section>
+    <section class="about">
         <div class="container">
             <div class="text-center">
                 <div class="text-center">
-                    <h2>Whats up?</h2>
+
                 </div>
                     <!-- /.row (nested) -->
             </div>
@@ -238,12 +245,11 @@ body {
     </section>
 
 
-
-    <section id="moodswing" class="services bg-primary">
+    <section id="moodswing" style="background-color: #ffebee"class="about"><h1 class="text-center" style="font-weight: bold">Moodswings<h1/></section>
+    <section class="about" >
         <div class="container">
             <div class="text-center">
                 <div class="text-center">
-                    <h2>Moodswings</h2>
                     </div>
                     <!-- /.row (nested) -->
                 </div>
