@@ -20,6 +20,5 @@ for item in r: #each tweet will be a Python dictionary
     #clean_text = ' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)"," ",text).split())
     # print clean_text
 
-    vs = vader(text)
-    
-    print("\n\t" + str(vs))
+
+    print str(vs['compound'])

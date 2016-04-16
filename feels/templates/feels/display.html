@@ -4,40 +4,42 @@
     <meta charset="utf-8">
 
     <title>Ja Feel</title>
- 
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-    <script type="text/javascript">
-      google.charts.load('current', {'packages':['geochart']});
-      google.charts.setOnLoadCallback(drawRegionsMap);
-
-      function drawRegionsMap() {
-
-        var data = google.visualization.arrayToDataTable([
-          ['Country', 'Sentiment'],
-          ['Germany', -0.3],
-          ['United States', 0.3],
-          ['Brazil', 0.2],
-          ['Canada', 0.8],
-          ['France', -0.8],
-          ['RU', -0.4],
-          ['Mexico', 0]
-        ]);
-
-        var options = {
-          colorAxis: {minValue : -1, maxValue : 1, colors: ['red', 'white', 'green']},
-        };
-
-        var chart = new google.visualization.GeoChart(document.getElementById('map_div'));
-
-        chart.draw(data, options);
-      }
-    </script>
+  
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.1.1/Chart.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 
   </head>
-
   <body>
     <h1> QUERY: {{ query }} </h1>
-    <div id="map_div" style="width: 900px; height: 500px;"></div>
+    <script type="text/javascript">
+
+            window.onload = function() { 
+                init();
+            };
+
+            function init() {
+                var ctx = $("#feeling").get(0).getContext("2d");
+
+                var data = {
+                    labels: ["January", "February", "March", "April", "May", "June", "July"],
+                    datasets: [
+                        {
+                            fillColor: "rgba(151,187,205,0)",
+                            strokeColor: "rgba(151,187,205,1)",
+                            pointColor: "rgba(151,187,205,1)",
+                            pointStrokeColor: "#fff",
+                            data: [-0.2, -0.5, -0.1, 0.3, 0.2, 0.6, 0.3]
+                        }
+                    ]
+                }
+
+                var myNewChart = new Chart(ctx).Line(data);
+            }
+
+        </script>
+    <div>
+      <canvas id="feeling" width="800" height="400">
+    </div>
+
   </body>
 </html>
