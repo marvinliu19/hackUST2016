@@ -14,7 +14,7 @@ def display(request):
   context = {}
   if request.method == "POST":
     api = TwitterAPI('BQBZTbY3ugTypaRBq7Is0m6Dh', 'JGeRqs3r42Id4W2Q47NlGwAlNYv0myrBhlUPJeeizQXi56RWBm', auth_type='oAuth2')
-    myQuery = request.POST['query']  # takes in query from front-end
+    myQuery = request.POST['query_text']  # takes in query from front-end
     r = api.request('search/tweets', {'q': myQuery})
     context = {  # adds query and JSON response of tweets to context
         'query': myQuery,
