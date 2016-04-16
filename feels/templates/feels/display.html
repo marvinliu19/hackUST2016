@@ -23,6 +23,9 @@
      <link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
 
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -33,6 +36,67 @@
 </head>
 
 <body>
+  <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var feeling_arr = [['Date', 'Sentiment']];
+        var retweet_arr = [['Date', 'Retweets']];
+
+        var bio_data_raw = '{{ bio_data }}'.replace(/&quot;/g,'"');
+        var tweet_data_raw = '{{ tweet_data }}'.replace(/&quot;/g,'"');
+        var bio_data = jQuery.parseJSON(bio_data_raw)
+        var tweet_data = jQuery.parseJSON(tweet_data_raw)
+        var tweets = tweet_data['tweets'];
+        
+        for (var i in tweets) {
+          date_obj = new Date(tweets[i]['date']);
+          date = new Date(date_obj.getFullYear(), date_obj.getMonth(), date_obj.getDate(), date_obj.getHours(), date_obj.getMinutes());
+
+          var feeling_entry = [date, tweets[i]['sentiment']['compound']];
+          var retweet_entry = [date, tweets[i]['retweet_count']];
+          
+          feeling_arr.push(feeling_entry);
+          retweet_arr.push(retweet_entry);
+        };
+
+        var feeling_data = google.visualization.arrayToDataTable(feeling_arr);
+        var feeling_options = {
+          animation: {startup: true, duration: 1, easing: 'in'},
+          legend: {position: 'none'},
+          hAxis: {
+            format: 'M/d/yy',
+            gridlines: {
+              color: 'none',
+              count: 4
+            }
+          },
+          vAxis: { 
+            title: "Sentiment", 
+            viewWindowMode:'explicit',
+            viewWindow:{
+              max:1,
+              min:-1
+            }
+          }
+        };
+
+        var retweet_data = google.visualization.arrayToDataTable(retweet_arr);
+        var retweet_options = {
+          title: 'Retweets over time',
+          animation: {startup: true, duration: 1, easing: 'in'}
+        };
+
+        var feeling_chart = new google.visualization.ScatterChart(document.getElementById('feeling'));
+        var retweet_chart = new google.visualization.ScatterChart(document.getElementById('retweet'));
+
+        feeling_chart.draw(feeling_data, feeling_options);
+        retweet_chart.draw(retweet_data, retweet_options);
+
+      }
+
+    </script>
 
 <style>
 body {
@@ -132,6 +196,7 @@ body {
             <div>
                 <div class="text-center">
                     <h2>Feelings</h2>
+                    <div id="feeling" style="width: 900px; height: 500px"></div>
                 </div>
             </div>
             <!-- /.row -->
@@ -146,6 +211,7 @@ body {
             <div class="text-center">
                 <div class="text-center">
                     <h2>Popularity</h2>
+                    <div id="retweet" style="width: 900px; height: 500px"></div>
                     </div>
                     <!-- /.row (nested) -->
                 </div>
