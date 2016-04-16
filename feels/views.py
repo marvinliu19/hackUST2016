@@ -1,26 +1,24 @@
-from django.http import HttpResponse
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from TwitterAPI import *
 
 def index(request):
-  context = {}
-  # if this is a POST request we need to process the form data
-  if request.method == 'POST':
-      # create a form instance and populate it with data from the request:
-      form = NameForm(request.POST)
-      # check whether it's valid:
-      if form.is_valid():
-          # process the data in form.cleaned_data as required
-          # ...
-          # redirect to a new URL:
-          cd = form.cleaned_data
-          cd
-          return HttpResponseRedirect('feels/display.html')
+    context = {}
+    #post request means we parse for a query
+    if request.method == 'POST':
+        api = TwitterAPI('BQBZTbY3ugTypaRBq7Is0m6Dh', 'JGeRqs3r42Id4W2Q47NlGwAlNYv0myrBhlUPJeeizQXi56RWBm', auth_type='oAuth2')
+        myQuery = request.POST['query'] #takes in query from front-end
+        r = api.request('search/tweets', {'q': myQuery})
+        '''
+        for item in r:
+            print(item)
+        '''
+        context = {  # adds query and JSON response of tweets to context
+            'query': myQuery,
+            'response': r
+        }
 
-  # if a GET (or any other method) we'll create a blank form
-  else:
-      form = NameForm()
-
-  return render(request, 'feels/index.html', context)
+    return render(request, 'feels/index.html', context)
 
 def display(request):
   context = {}
