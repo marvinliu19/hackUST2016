@@ -17,7 +17,6 @@ def display(request):
         r = api.request('search/tweets', {'q': myQuery})
         context = {  # adds query and JSON response of tweets to context
             'query': myQuery,
-            'response': r
         }
         context = RequestContext(request, context)
     return render_to_response('feels/display.html', context)
