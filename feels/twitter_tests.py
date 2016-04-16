@@ -9,8 +9,9 @@ print("authentification success\n")
 
 name_query = "realdonaldtrump" #THIS WILL BE NOT HARDCODED AND WILL BE TAKEN FROM THE FRONT END
 count = 10
-r = api.request('statuses/user_timeline', {'screen_name': name_query, 'count':count, 'exclude_replies':'true', 'include_rts':'false'})
 
+# requests to twitter, one for one's tweet the other for one's personal info
+r = api.request('statuses/user_timeline', {'screen_name': name_query, 'count':count, 'exclude_replies':'true', 'include_rts':'false'})
 personalInfoResponse = api.request('users/show', {'screen_name' : name_query, 'include_entities' : 'false'}).json()
 
 realName = personalInfoResponse['name']
