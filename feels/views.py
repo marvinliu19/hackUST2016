@@ -112,11 +112,12 @@ def display(request):
         name_query = request.POST['query_text']
         name_query = name_query.replace('@', '')
     
-    if name_query == '':
-        name_query = 'kanyewest'
+
 
   # Authentification
     api = TwitterAPI('BQBZTbY3ugTypaRBq7Is0m6Dh', 'JGeRqs3r42Id4W2Q47NlGwAlNYv0myrBhlUPJeeizQXi56RWBm', auth_type='oAuth2')
+
+
 
     # requests to twitter, one for one's tweet the other for one's personal info
     count = 200
@@ -126,13 +127,23 @@ def display(request):
     # Error testing, if user not found, we search for one
     if 'errors' in personalInfoResponse:
         error = personalInfoResponse['errors']
-        print error[0]['message']
+        name_query = 'kanyewest'
+        tweets = api.request('statuses/user_timeline', {'screen_name': name_query, 'count':count, 'exclude_replies':'true', 'include_rts':'false'})
+        personalInfoResponse = api.request('users/show', {'screen_name' : name_query, 'include_entities' : 'false'}).json()
+        bio_output = json.dumps(build_bio_dict(personalInfoResponse))
+        tweets_output = json.dumps(build_tweets_dict(tweets))
+        top_hashtags = json.dumps(build_hashtag_freq(tweets))
+        context = {
+            'query': name_query
+        }
 
-        if error[0]['code'] == 50:
-            #user not found, we search for the closest matching username
-            display(search_users(name_query)[0])
-      
-    # No errors
+        context = RequestContext(request, context)
+        context['bio_data'] = bio_output
+        context['tweet_data'] = tweets_output
+        context['top_hashtags'] = top_hashtags
+
+        return render_to_response('feels/display.html', context)
+
     else:
         bio_output = json.dumps(build_bio_dict(personalInfoResponse))
         tweets_output = json.dumps(build_tweets_dict(tweets))
