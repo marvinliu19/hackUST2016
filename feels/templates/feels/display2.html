@@ -1,13 +1,7 @@
 <!DOCTYPE html>
-
 <html lang="en">
+{% load static %}
 <head>
-  <!--<meta charset="utf-8">-->
-  <!--<meta name="viewport" content="width=device-width, initial-scale=1">-->
-  <!--<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">-->
-  <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>-->
-  <!--<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>-->
-
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -16,14 +10,17 @@
 
     <title>Ja Feel</title>
 
-    <link rel="script" type="text/css" href="">
-    <link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
+    <!-- Bootstrap Core CSS -->
+    <!--<link href="css/bootstrap.min.css" rel="stylesheet">-->
+    <link rel="stylesheet" type="text/css" href="{% static 'bootstrap.css' %}" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" type="text/css" href="{% static 'stylish-portfolio.css' %}" />
+
+    <!-- Custom Fonts -->
+    <link href="{% static 'font-awesome/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css">
+     <link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
-
-
-    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
-  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -36,8 +33,8 @@
     <![endif]-->
 
 </head>
-<body>
 
+<body>
     <script type="text/javascript">
       google.charts.load('current', {'packages':['corechart', 'bar']});
       google.charts.setOnLoadCallback(drawChart);
@@ -77,18 +74,17 @@
         };
 
         var tweets = tweet_data['tweets'];
-
+        
         for (var i in tweets) {
           date_obj = new Date(tweets[i]['date']);
           date = new Date(date_obj.getFullYear(), date_obj.getMonth(), date_obj.getDate(), date_obj.getHours(), date_obj.getMinutes());
 
           var feeling_entry = [date, tweets[i]['sentiment']['compound']];
           var retweet_entry = [date, tweets[i]['retweet_count']];
-
+          
           feeling_arr.push(feeling_entry);
           retweet_arr.push(retweet_entry);
         };
-
 
         var feeling_data = google.visualization.arrayToDataTable(feeling_arr);
         var feeling_options = {
@@ -102,7 +98,8 @@
               count: 4
             }
           },
-          vAxis: {
+          vAxis: { 
+            title: "Sentiment", 
             viewWindowMode:'explicit',
             viewWindow:{
               max:1,
@@ -113,6 +110,7 @@
 
         var retweet_data = google.visualization.arrayToDataTable(retweet_arr);
         var retweet_options = {
+            title: 'Retweets over time',
             animation: {startup: true, duration: 1, easing: 'in'},
             colors: ['#FFCC80'],
             legend: {position: 'none'},
@@ -139,9 +137,6 @@
         feeling_chart.draw(feeling_data, feeling_options);
         retweet_chart.draw(retweet_data, retweet_options);
         top_hashtag_chart.draw(top_hashtag_data, top_hashtag_options);
-          document.getElementById('popular').setAttribute("class", "tab-pane");
-
-          document.getElementById('hashtag').setAttribute("class", "tab-pane");
       }
 
     </script>
@@ -186,8 +181,8 @@ body {
 }
 
 .circular {
-	width: 150px;
-	height: 150px;
+	width: 300px;
+	height: 300px;
 	border-radius: 150px;
 	-webkit-border-radius: 150px;
 	-moz-border-radius: 150px;
@@ -202,51 +197,115 @@ body {
 }
 </style>
 
-    <div>
-        <div align="center" >
-            <div style="padding: 5px;">
+<a style=";font-size:60px; padding-left: 5px; cursor: auto;" onclick="openNav()display.html">☰</a>
+
+    <div id="mySidenav" class="sidenav">
+  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+        <a href="#top">Overview</a>
+        <a href="#feelings">Feelings</a>
+        <a href="#popular">Popularity</a>
+        <a href="#whatup">Whats up?</a>
+        <a href="#moodswing">Mood Swings</a>
+    </div>
+        
+    <!-- Header -->
+    <header id="top" class="header">
+        <!--<img class="bg-primary" src="{% static 'bg1.jpg' %}" style="width: inherit">-->
+        <div class="text-vertical-center" >
+            <div style="padding-bottom: 50px;">
                 <img class="circular" src="" id="picture"/>
             </div>
             <h1 id="name">NAME</h1>
             <h2 id="handle" style="color:#a9a9a9">@</h2>
             <h3 id="bio">BIO</h3>
             <h4 id="followers">Followers: </h4>
+            <br>
         </div>
-    </div>
+    </header>
 
-<div class="container">
-	<div>
-        <div>
-                                    <!-- Nav tabs --><div class="card">
-                                    <ul class="nav nav-tabs" role="tablist" style="padding-left: 25%;">
-                                        <li role="presentation" class="active"><a href="#feelings" aria-controls="feelings" role="tab" data-toggle="tab" style="font-size: 30px;color: #ffffff; background-color: #A5D6A7">Feeling</a></li>
-                                        <li role="presentation"><a href="#popular" aria-controls="popular" role="tab" data-toggle="tab" style="font-size: 30px;color: #ffffff; background-color: #FFCC80">Poularity</a></li>
-                                        <li role="presentation"><a href="#hashtag" aria-controls="whatup" role="tab" data-toggle="tab" style="font-size: 30px;color: #ffffff; background-color: #EF9A9A">Hashtags</a></li>
-                                        <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab" style="font-size: 30px;color: #ffffff; background-color: #81D4FA">Settings</a></li>
-                                    </ul>
-
-                                    <!-- Tab panes -->
-                                    <div class="tab-content">
-                                        <div role="tabpanel" class="tab-pane active" id="feelings">
-                                            <br>
-                                                    <div  id="feeling" style="width: 100%; height: 450px;"></div>
-                                        </div>
-                                        <div role="tabpanel" class="tab-pane active" id="popular">
-                                            <br>
-                                                        <div id="retweet" style="width: 100%; height: 450px;"></div>
-                                        </div>
-                                        <div role="tabpanel" class="tab-pane active" id="hashtag" align="center">
-                                            <br>
-                                                    <div id="hashtags" style="width: 80%; height: 450px;"></div>
-                                        </div>
-                                        <div role="tabpanel" class="tab-pane" id="settings">
-
-                                        </div>
-                                    </div>
-                                </div>
+    <!-- Feelings -->
+    <section id="feelings" style="background-color: #A5D6A7"class="about"><h1 class="text-center" style="font-weight: bold">Tweet Sentiment</h1></section>
+    <section class="about">
+        <div class="container">
+            <div>
+                <div>
+                    <div  id="feeling" style="width: 100%; height: 500px;"></div>
+            </div>
+            <!-- /.row -->
         </div>
-	</div>
-</div>
+            </div>
+        <!-- /.container -->
+    </section>
+
+    <!-- Services -->
+    <!-- The circle icons use Font Awesome's stacked icon classes. For more information, visit http://fontawesome.io/examples/ -->
+    <section id="popular" style="background-color: #FFCC80"class="about"><h1 class="text-center" style="font-weight: bold">Tweet Popularity</h1></section>
+    <section class="about" >
+        <div class="container">
+            <div class="text-center">
+                <div class="text-center">
+                    <div id="retweet" style="width: 100%; height: 500px;"></div>
+
+                    </div>
+                    <!-- /.row (nested) -->
+                </div>
+                <!-- /.col-lg-10 -->
+            </div>
+            <!-- /.row -->
+        </div>
+        <!-- /.container -->
+    </section>
+
+    <section id="whatup" style="background-color: #EF9A9A"class="about"><h1 class="text-center" style="font-weight: bold">Most Used Hashtags</h1></section>
+    <section class="about">
+        <div class="container">
+            <div class="text-center">
+                <div class="text-center">
+                    <div id="hashtags" style="width: 100%; height: 500px;"></div>
+
+                </div>
+                    <!-- /.row (nested) -->
+            </div>
+                <!-- /.col-lg-10 -->
+        </div>
+            <!-- /.row -->
+
+        <!-- /.container -->
+    </section>
+
+
+    <section id="moodswing" style="background-color: #ffebee"class="about"><h1 class="text-center" style="font-weight: bold">Moodswings<h1/></section>
+    <section class="about" >
+        <div class="container">
+            <div class="text-center">
+                <div class="text-center">
+                    </div>
+                    <!-- /.row (nested) -->
+                </div>
+                <!-- /.col-lg-10 -->
+            </div>
+            <!-- /.row -->
+        </div>
+        <!-- /.container -->
+    </section>
+
+    <!-- jQuery -->
+    <script href="{% static 'jquery.js' %}"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script href="{% static 'bootstrap.min.js' %}"></script>
+
+
+    <script>
+        function openNav() {
+            document.getElementById("mySidenav").style.width = "250px";
+        }
+
+        function closeNav() {
+            document.getElementById("mySidenav").style.width = "0";
+        }
+    </script>
 
 </body>
+
 </html>
