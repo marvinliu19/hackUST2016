@@ -91,12 +91,17 @@
           date_obj = new Date(tweets[i]['date']);
           date = new Date(date_obj.getFullYear(), date_obj.getMonth(), date_obj.getDate(), date_obj.getHours(), date_obj.getMinutes());
 
-          var feeling_entry = [date, tweets[i]['sentiment']['compound']];
+          // (1+ pp - pn)/nc
+          var sentiment_agregate = (tweets[i]['sentiment']['pos'] - tweets[i]['sentiment']['neg'])/(1+tweets[i]['sentiment']['neu']);
+          console.log([date,tweets[i]['sentiment']['Positive']]);
+          console.log(sentiment_agregate);
+          var feeling_entry = [date, sentiment_agregate];
           var retweet_entry = [date, tweets[i]['retweet_count']];
 
           feeling_arr.push(feeling_entry);
           retweet_arr.push(retweet_entry);
         };
+        console.log(feeling_arr);
 
         var feeling_data = google.visualization.arrayToDataTable(feeling_arr);
         var feeling_options = {
