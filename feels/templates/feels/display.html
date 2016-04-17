@@ -56,6 +56,7 @@
       function drawChart() {
         var feeling_arr = [['Date', 'Sentiment']];
         var retweet_arr = [['Date', 'Retweets']];
+        var other_arr = [['Sentiment', 'Count']];
 
         var colors = [ '#A5D6A7', '#FFCC80', '#EF9A9A', '#ffebee' ];
 
@@ -67,9 +68,17 @@
 
         var hashtag_data_raw = '{{ top_hashtags }}'.replace(/&quot;/g,'"');
 
+        var other_tweet_data_raw = '{{ other_tweets }}'.replace(/&quot;/g,'"');
+
         var bio_data = jQuery.parseJSON(bio_data_raw);
         var tweet_data = jQuery.parseJSON(tweet_data_raw);
         var hashtag_data = jQuery.parseJSON(hashtag_data_raw);
+        var other_tweet_data = jQuery.parseJSON(other_tweet_data_raw);
+
+        var other_counts = other_tweet_data['sentiment_count'];
+        other_arr.push(['Positive', other_counts['Positive']]);
+        other_arr.push(['Negative', other_counts['Negative']]);
+        other_arr.push(['Neutral', other_counts['Neutral']]);
 
         for (var i in hashtag_data['hashtags']) {
           ht_data = hashtag_data['hashtags'][i];
@@ -88,7 +97,6 @@
           feeling_arr.push(feeling_entry);
           retweet_arr.push(retweet_entry);
         };
-
 
         var feeling_data = google.visualization.arrayToDataTable(feeling_arr);
         var feeling_options = {
@@ -132,16 +140,23 @@
             colors: ['#EF9A9A']
         };
 
+        var other_data = google.visualization.arrayToDataTable(other_arr);
+        var other_options =  {
+
+        };
+
         var feeling_chart = new google.visualization.ScatterChart(document.getElementById('feeling'));
         var retweet_chart = new google.visualization.ScatterChart(document.getElementById('retweet'));
         var top_hashtag_chart = new google.charts.Bar(document.getElementById("hashtags"));
+        var other_chart = new google.visualization.PieChart(document.getElementById('others'));
 
         feeling_chart.draw(feeling_data, feeling_options);
         retweet_chart.draw(retweet_data, retweet_options);
         top_hashtag_chart.draw(top_hashtag_data, top_hashtag_options);
-          document.getElementById('popular').setAttribute("class", "tab-pane");
-
-          document.getElementById('hashtag').setAttribute("class", "tab-pane");
+        other_chart.draw(other_data, other_options);
+        document.getElementById('popular').setAttribute("class", "tab-pane");
+        document.getElementById('hashtag').setAttribute("class", "tab-pane");
+        document.getElementById('others').setAttribute("class", "tab-pane");
       }
 
     </script>
@@ -220,10 +235,10 @@ body {
                                 <!-- Nav tabs -->
                                 <div class="card">
                                     <ul class="nav nav-tabs nav-justified" role="tablist">
-                                        <li role="presentation" class="active"><a href="#feelings" aria-controls="feelings" role="tab" data-toggle="tab" style="font-size: 30px;color: #ffffff; background-color: #A5D6A7">Feeling</a></li>
-                                        <li role="presentation"><a href="#popular" aria-controls="popular" role="tab" data-toggle="tab" style="font-size: 30px;color: #ffffff; background-color: #FFCC80">Poularity</a></li>
-                                        <li role="presentation"><a href="#hashtag" aria-controls="whatup" role="tab" data-toggle="tab" style="font-size: 30px;color: #ffffff; background-color: #EF9A9A">Hashtags</a></li>
-                                        <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab" style="font-size: 30px;color: #ffffff; background-color: #81D4FA">Settings</a></li>
+                                        <li role="presentation" class="active"><a href="#feelings" aria-controls="feelings" role="tab" data-toggle="tab" style="font-size: 30px;color: #ffffff; background-color: #A5D6A7">Tweet Sentiment</a></li>
+                                        <li role="presentation"><a href="#popular" aria-controls="popular" role="tab" data-toggle="tab" style="font-size: 30px;color: #ffffff; background-color: #FFCC80">Popularity</a></li>
+                                        <li role="presentation"><a href="#hashtag" aria-controls="hashtag" role="tab" data-toggle="tab" style="font-size: 30px;color: #ffffff; background-color: #EF9A9A">Hashtags</a></li>
+                                        <li role="presentation"><a href="#others" aria-controls="others" role="tab" data-toggle="tab" style="font-size: 30px;color: #ffffff; background-color: #81D4FA">Public Opinion</a></li>
                                     </ul>
 
                                     <!-- Tab panes -->
@@ -240,8 +255,8 @@ body {
                                             <br>
                                                     <div id="hashtags" style="width: 80%; height: 450px;"></div>
                                         </div>
-                                        <div role="tabpanel" class="tab-pane" id="settings">
-
+                                        <div role="tabpanel" class="tab-pane active" id="others">
+                                                    <div id="others" style="width: 150%; height: 450px;"></div>
                                         </div>
                                     </div>
                                 </div>

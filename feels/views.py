@@ -96,6 +96,34 @@ def build_hashtag_freq(tweets):
         top_hashtags['hashtags'].append([k, v])
     return top_hashtags
 
+def build_other_tweets(tweets):
+    tweets_dict = {'tweets': [], 'sentiment_count': {'Positive': 0, 'Neutral': 0, 'Negative':0}}
+    
+    for tweet in tweets: #each tweet will be a Python dictionary
+        text = tweet['text'].encode('ascii', 'ignore')
+        text = ' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)"," ",text).split())
+        text.strip()
+
+        if text == "":
+            continue
+
+        date = tweet['created_at'].encode('ascii', 'ignore')
+        retweet_count = tweet['retweet_count']
+        sentiment = vader(text)
+
+        if sentiment['compound'] < -0.1:
+            tweets_dict['sentiment_count']['Negative'] += 1
+        elif sentiment['compound'] > 0.1:
+            tweets_dict['sentiment_count']['Positive'] += 1
+        else:
+            tweets_dict['sentiment_count']['Neutral'] += 1
+
+        tweet_data = {"text" : text, "date" : date, "retweet_count" : retweet_count, "sentiment" : sentiment}
+        tweets_dict["tweets"].insert(0, tweet_data)
+
+    return tweets_dict
+
+
 def index(request):
     form = QueryForm()
     context = RequestContext(request, {'form': form})
@@ -122,6 +150,7 @@ def display(request):
     # requests to twitter, one for one's tweet the other for one's personal info
     count = 200
     tweets = api.request('statuses/user_timeline', {'screen_name': name_query, 'count':count, 'exclude_replies':'true', 'include_rts':'false'})
+    otherTweets = api.request('search/tweets', {'q': '@'+name_query, 'count':count, 'lang': 'en'});
     personalInfoResponse = api.request('users/show', {'screen_name' : name_query, 'include_entities' : 'false'}).json()
 
     # Error testing, if user not found, we search for one
@@ -148,6 +177,7 @@ def display(request):
         bio_output = json.dumps(build_bio_dict(personalInfoResponse))
         tweets_output = json.dumps(build_tweets_dict(tweets))
         top_hashtags = json.dumps(build_hashtag_freq(tweets))
+        other_tweets_output = json.dumps(build_other_tweets(otherTweets))
         context = {
           'query': name_query
         }
@@ -156,5 +186,6 @@ def display(request):
         context['bio_data'] = bio_output
         context['tweet_data'] = tweets_output
         context['top_hashtags'] = top_hashtags
+        context['other_tweets'] = other_tweets_output
 
         return render_to_response('feels/display.html', context)
