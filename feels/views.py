@@ -161,6 +161,7 @@ def display(request):
         personalInfoResponse = api.request('users/show', {'screen_name' : name_query, 'include_entities' : 'false'}).json()
         bio_output = json.dumps(build_bio_dict(personalInfoResponse))
         tweets_output = json.dumps(build_tweets_dict(tweets))
+        other_tweets_output = json.dumps(build_other_tweets(otherTweets))
         top_hashtags = json.dumps(build_hashtag_freq(tweets))
         context = {
             'query': name_query
@@ -170,6 +171,7 @@ def display(request):
         context['bio_data'] = bio_output
         context['tweet_data'] = tweets_output
         context['top_hashtags'] = top_hashtags
+        context['other_tweets'] = other_tweets_output
 
         return render_to_response('feels/display.html', context)
 
